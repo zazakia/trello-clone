@@ -8,7 +8,9 @@ import { ReminderManager } from './components/ReminderManager';
 
 function AppContent() {
   const [selectedBoardId, setSelectedBoardId] = useState<string | null>(null);
-  const { state } = useBoard();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showCreateBoard, setShowCreateBoard] = useState(false);
+  const { state, actions } = useBoard();
   const { currentBoard } = state;
 
   const handleSelectBoard = (boardId: string) => {
@@ -17,13 +19,35 @@ function AppContent() {
 
   const handleBackToBoards = () => {
     setSelectedBoardId(null);
+    setSearchQuery('');
+  };
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+  };
+
+  const handleCreateBoard = () => {
+    setShowCreateBoard(true);
+  };
+
+  const handleCreateBoardSubmit = async (title: string, description?: string) => {
+    try {
+      await actions.createBoard(title, description);
+      setShowCreateBoard(false);
+    } catch (error) {
+      console.error('Failed to create board:', error);
+    }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-800 via-purple-900 to-indigo-900">
       <ReminderManager />
-      <Header boardTitle={selectedBoardId ? currentBoard?.title : undefined} />
-        <main className="h-[calc(100vh-64px)] relative">
+      <Header 
+        boardTitle={selectedBoardId ? currentBoard?.title : undefined}
+        onSearch={handleSearch}
+        onCreateBoard={handleCreateBoard}
+      />
+        <main className="h-[calc(100vh-73px)] relative">
           {selectedBoardId ? (
             <div className="h-full">
               <div className="p-4">
@@ -35,32 +59,51 @@ function AppContent() {
                   <span>Back to boards</span>
                 </button>
               </div>
-              <Board boardId={selectedBoardId} />
+              <Board boardId={selectedBoardId} searchQuery={searchQuery} />
             </div>
           ) : (
             <div className="bg-white h-full overflow-y-auto">
-              <BoardSelector onSelectBoard={handleSelectBoard} />
+              <BoardSelector 
+                onSelectBoard={handleSelectBoard} 
+                searchQuery={searchQuery}
+                showCreateBoard={showCreateBoard}
+                onCreateBoard={handleCreateBoardSubmit}
+                onCancelCreate={() => setShowCreateBoard(false)}
+              />
             </div>
           )}
           
           {selectedBoardId && (
-            <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 mb-4">
-              <div className="flex items-center space-x-4 bg-purple-800 rounded-lg px-6 py-3">
-                <button className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors">
+            <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-10 w-full max-w-sm sm:max-w-none sm:w-auto px-4 sm:px-0">
+              <div className="flex items-center justify-center space-x-2 sm:space-x-4 bg-purple-800 rounded-lg px-3 sm:px-6 py-3 shadow-lg border border-purple-700">
+                <button 
+                  className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors"
+                  title="Inbox"
+                >
                   <span className="text-sm">📥</span>
-                  <span className="text-sm">Inbox</span>
+                  <span className="text-sm hidden sm:inline">Inbox</span>
                 </button>
-                <button className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors">
+                <button 
+                  className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors"
+                  title="Planner"
+                >
                   <span className="text-sm">📅</span>
-                  <span className="text-sm">Planner</span>
+                  <span className="text-sm hidden sm:inline">Planner</span>
                 </button>
-                <button className="flex items-center space-x-2 text-blue-400 border-b-2 border-blue-400 pb-1">
+                <button 
+                  className="flex items-center space-x-2 text-blue-400 border-b-2 border-blue-400 pb-1"
+                  title="Current: Board View"
+                >
                   <span className="text-sm">📋</span>
-                  <span className="text-sm font-medium">Board</span>
+                  <span className="text-sm font-medium hidden sm:inline">Board</span>
                 </button>
-                <button className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors">
+                <button 
+                  onClick={handleBackToBoards}
+                  className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors"
+                  title="Switch boards"
+                >
                   <span className="text-sm">🔄</span>
-                  <span className="text-sm">Switch boards</span>
+                  <span className="text-sm hidden sm:inline">Switch</span>
                 </button>
               </div>
             </div>

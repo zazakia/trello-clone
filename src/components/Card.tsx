@@ -9,9 +9,10 @@ interface CardProps {
   index: number;
   onUpdate: (id: string, title: string, description?: string, reminderDate?: string | null, reminderEnabled?: boolean) => void;
   onDelete: (id: string) => void;
+  searchQuery?: string;
 }
 
-export function Card({ card, index, onUpdate, onDelete }: CardProps) {
+export function Card({ card, index, onUpdate, onDelete, searchQuery = '' }: CardProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState(card.title);
   const [description, setDescription] = useState(card.description || '');
@@ -64,6 +65,24 @@ export function Card({ card, index, onUpdate, onDelete }: CardProps) {
     }
   };
 
+  // Function to highlight search matches
+  const highlightText = (text: string, query: string) => {
+    if (!query.trim()) return text;
+    
+    const regex = new RegExp(`(${query})`, 'gi');
+    const parts = text.split(regex);
+    
+    return parts.map((part, index) => 
+      regex.test(part) ? (
+        <mark key={index} className="bg-yellow-200 text-gray-900 px-1 rounded">
+          {part}
+        </mark>
+      ) : (
+        part
+      )
+    );
+  };
+
   return (
     <Draggable draggableId={card.id} index={index}>
       {(provided, snapshot) => (
@@ -111,7 +130,9 @@ export function Card({ card, index, onUpdate, onDelete }: CardProps) {
           ) : (
             <div>
               <div className="flex items-start justify-between">
-                <h4 className="text-sm font-medium text-gray-900 flex-1">{card.title}</h4>
+                <h4 className="text-sm font-medium text-gray-900 flex-1">
+                  {highlightText(card.title, searchQuery)}
+                </h4>
                 <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-all duration-300">
                   <button
                     onClick={() => setShowReminderPicker(true)}
@@ -143,7 +164,9 @@ export function Card({ card, index, onUpdate, onDelete }: CardProps) {
                 </div>
               </div>
               {card.description && (
-                <p className="text-xs text-gray-600 mt-2">{card.description}</p>
+                <p className="text-xs text-gray-600 mt-2">
+                  {highlightText(card.description, searchQuery)}
+                </p>
               )}
               
               {/* Reminder indicator */}

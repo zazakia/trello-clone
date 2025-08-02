@@ -13,6 +13,7 @@ interface ListProps {
   onCreateCard: (title: string, listId: string) => void;
   onUpdateCard: (id: string, title: string, description?: string) => void;
   onDeleteCard: (id: string) => void;
+  searchQuery?: string;
 }
 
 export function List({
@@ -23,6 +24,7 @@ export function List({
   onCreateCard,
   onUpdateCard,
   onDeleteCard,
+  searchQuery = '',
 }: ListProps) {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [title, setTitle] = useState(list.title);
@@ -50,6 +52,24 @@ export function List({
   };
 
   const sortedCards = (list.cards || []).sort((a, b) => a.position - b.position);
+  
+  // Filter cards based on search query
+  const filteredCards = sortedCards.filter(card => {
+    if (!searchQuery.trim()) return true;
+    const query = searchQuery.toLowerCase();
+    return card.title.toLowerCase().includes(query) ||
+           (card.description && card.description.toLowerCase().includes(query));
+  });
+  
+  // Check if list title matches search
+  const listMatches = !searchQuery.trim() || list.title.toLowerCase().includes(searchQuery.toLowerCase());
+  
+  // Show list if it matches search OR has matching cards
+  const shouldShowList = listMatches || filteredCards.length > 0;
+
+  if (!shouldShowList && searchQuery.trim()) {
+    return null;
+  }
 
   return (
     <Draggable draggableId={`list-${list.id}`} index={index}>
@@ -142,13 +162,14 @@ export function List({
                   snapshot.isDraggingOver ? 'bg-blue-500/20 rounded-lg p-1' : ''
                 }`}
               >
-                {sortedCards.map((card, cardIndex) => (
+                {(searchQuery ? filteredCards : sortedCards).map((card, cardIndex) => (
                   <Card
                     key={card.id}
                     card={card}
                     index={cardIndex}
                     onUpdate={onUpdateCard}
                     onDelete={onDeleteCard}
+                    searchQuery={searchQuery}
                   />
                 ))}
                 {provided.placeholder}

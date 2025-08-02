@@ -6,9 +6,10 @@ import { AddButton } from './AddButton';
 
 interface BoardProps {
   boardId: string;
+  searchQuery?: string;
 }
 
-export function Board({ boardId }: BoardProps) {
+export function Board({ boardId, searchQuery = '' }: BoardProps) {
   const { state, actions } = useBoard();
   const { currentBoard, loading, error } = state;
 
@@ -77,7 +78,7 @@ export function Board({ boardId }: BoardProps) {
   const sortedLists = (currentBoard.lists || []).sort((a, b) => a.position - b.position);
 
   return (
-    <div className="h-full overflow-x-auto">
+    <div className="h-full overflow-x-auto pb-24">
       <DragDropContext onDragEnd={handleDragEnd}>
         <Droppable droppableId="board" direction="horizontal" type="list">
           {(provided) => (
@@ -96,6 +97,7 @@ export function Board({ boardId }: BoardProps) {
                   onCreateCard={actions.createCard}
                   onUpdateCard={actions.updateCard}
                   onDeleteCard={actions.deleteCard}
+                  searchQuery={searchQuery}
                 />
               ))}
               {provided.placeholder}
