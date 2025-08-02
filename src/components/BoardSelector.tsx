@@ -2,7 +2,6 @@ import { useEffect, useState, useMemo } from 'react';
 import { useBoard } from '../hooks/useBoard';
 import { ConnectionTest } from './ConnectionTest';
 import { Search, Plus, X } from 'lucide-react';
-import { useBoardNotifications } from '../hooks/useBoardNotifications';
 
 interface BoardSelectorProps {
   onSelectBoard: (boardId: string) => void;
