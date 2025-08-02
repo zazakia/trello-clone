@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { Search, Bell, HelpCircle, Grid3X3, ChevronDown, X } from 'lucide-react';
+import { useNotifications } from '../contexts/NotificationContext';
+import { NotificationCenter } from './NotificationCenter';
 
 interface HeaderProps {
   boardTitle?: string;
@@ -10,6 +12,8 @@ interface HeaderProps {
 export function Header({ boardTitle, onSearch, onCreateBoard }: HeaderProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const { state: notificationState } = useNotifications();
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
@@ -62,10 +66,16 @@ export function Header({ boardTitle, onSearch, onCreateBoard }: HeaderProps) {
             Create
           </button>
           <button 
-            className="p-2 hover:bg-purple-700 rounded-lg transition-all duration-200"
+            onClick={() => setShowNotifications(!showNotifications)}
+            className="relative p-2 hover:bg-purple-700 rounded-lg transition-all duration-200"
             title="Notifications"
           >
             <Bell className="h-4 w-4" />
+            {notificationState.unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-medium">
+                {notificationState.unreadCount > 9 ? '9+' : notificationState.unreadCount}
+              </span>
+            )}
           </button>
           <button 
             className="p-2 hover:bg-purple-700 rounded-lg transition-all duration-200"
@@ -78,6 +88,11 @@ export function Header({ boardTitle, onSearch, onCreateBoard }: HeaderProps) {
           </div>
         </div>
       </div>
+      
+      <NotificationCenter 
+        isOpen={showNotifications}
+        onClose={() => setShowNotifications(false)}
+      />
 
       {boardTitle && (
         <div className="mt-2 flex items-center space-x-4">

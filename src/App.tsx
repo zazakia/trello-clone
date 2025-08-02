@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { BoardProvider } from './contexts/BoardContext';
+import { NotificationProvider } from './contexts/NotificationContext';
 import { useBoard } from './hooks/useBoard';
 import { Header } from './components/Header';
 import { BoardSelector } from './components/BoardSelector';
@@ -115,9 +116,11 @@ function AppContent() {
 
 function App() {
   return (
-    <BoardProvider>
-      <AppContent />
-    </BoardProvider>
+    <NotificationProvider>
+      <BoardProvider>
+        <AppContent />
+      </BoardProvider>
+    </NotificationProvider>
   );
 }
 

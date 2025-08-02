@@ -78,3 +78,38 @@ export interface DragResult {
     index: number;
   } | null;
 }
+
+export interface AppNotification {
+  id: string;
+  type: 'reminder' | 'system' | 'board_activity' | 'mention';
+  title: string;
+  message: string;
+  cardId?: string;
+  boardId?: string;
+  listId?: string;
+  createdAt: string;
+  readAt?: string;
+  dismissedAt?: string;
+  snoozedUntil?: string;
+  priority: 'low' | 'medium' | 'high';
+  actionUrl?: string;
+  metadata?: {
+    reminderDate?: string;
+    cardTitle?: string;
+    boardTitle?: string;
+    listTitle?: string;
+  };
+}
+
+export interface NotificationSettings {
+  browserNotifications: boolean;
+  emailNotifications: boolean;
+  reminderNotifications: boolean;
+  boardActivityNotifications: boolean;
+  mentionNotifications: boolean;
+  quietHours: {
+    enabled: boolean;
+    startTime: string;
+    endTime: string;
+  };
+}

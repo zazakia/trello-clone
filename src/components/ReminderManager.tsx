@@ -1,12 +1,14 @@
 import { useEffect, useRef } from 'react';
 import { useBoard } from '../hooks/useBoard';
-import { useNotifications } from '../hooks/useNotifications';
+import { useNotifications as useBrowserNotifications } from '../hooks/useNotifications';
+import { useNotifications as useAppNotifications } from '../contexts/NotificationContext';
 import { reminderService, getAllCardsFromBoard } from '../services/reminderService';
 import type { Card } from '../types';
 
 export function ReminderManager() {
   const { state } = useBoard();
-  const { showNotification } = useNotifications();
+  const { showNotification } = useBrowserNotifications();
+  const { actions: notificationActions } = useAppNotifications();
   const intervalRef = useRef<number | null>(null);
   const notifiedCardsRef = useRef<Set<string>>(new Set());
 
@@ -18,12 +20,21 @@ export function ReminderManager() {
 
     notifiedCardsRef.current.add(card.id);
     
+    // Show browser notification
     showNotification({
       title: '🔔 Trello Reminder',
       body: `Don't forget: ${card.title}`,
       tag: `reminder-${card.id}`,
       requireInteraction: true,
     });
+
+    // Add to app notification center
+    notificationActions.createReminderNotification(
+      card.title,
+      card.reminder_date || new Date().toISOString(),
+      card.id,
+      card.list_id
+    );
 
     // Remove from notified set after 5 minutes to allow re-notification for overdue items
     setTimeout(() => {
