@@ -6,11 +6,14 @@ import { Header } from './components/Header';
 import { BoardSelector } from './components/BoardSelector';
 import { Board } from './components/Board';
 import { ReminderManager } from './components/ReminderManager';
+import { ProjectAnalyticsDashboard } from './components/ProjectAnalyticsDashboard';
+import type { Project } from './types';
 
 function AppContent() {
   const [selectedBoardId, setSelectedBoardId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [showCreateBoard, setShowCreateBoard] = useState(false);
+  const [showAnalytics, setShowAnalytics] = useState(false);
   const { state, actions } = useBoard();
   const { currentBoard } = state;
 
@@ -31,6 +34,14 @@ function AppContent() {
     setShowCreateBoard(true);
   };
 
+  const handleShowAnalytics = () => {
+    setShowAnalytics(true);
+  };
+
+  const handleCloseAnalytics = () => {
+    setShowAnalytics(false);
+  };
+
   const handleCreateBoardSubmit = async (title: string, description?: string) => {
     try {
       await actions.createBoard(title, description);
@@ -47,6 +58,8 @@ function AppContent() {
         boardTitle={selectedBoardId ? currentBoard?.title : undefined}
         onSearch={handleSearch}
         onCreateBoard={handleCreateBoard}
+        onShowAnalytics={handleShowAnalytics}
+        showAnalyticsButton={!!selectedBoardId}
       />
         <main className="h-[calc(100vh-73px)] relative">
           {selectedBoardId ? (
@@ -108,6 +121,14 @@ function AppContent() {
                 </button>
               </div>
             </div>
+          )}
+          
+          {/* Analytics Dashboard */}
+          {showAnalytics && currentBoard && (
+            <ProjectAnalyticsDashboard 
+              project={currentBoard as Project}
+              onClose={handleCloseAnalytics}
+            />
           )}
         </main>
     </div>

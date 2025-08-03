@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Bell, HelpCircle, Grid3X3, ChevronDown, X } from 'lucide-react';
+import { Search, Bell, HelpCircle, Grid3X3, ChevronDown, X, BarChart3 } from 'lucide-react';
 import { useNotifications } from '../contexts/NotificationContext';
 import { NotificationCenter } from './NotificationCenter';
 
@@ -7,9 +7,11 @@ interface HeaderProps {
   boardTitle?: string;
   onSearch?: (query: string) => void;
   onCreateBoard?: () => void;
+  onShowAnalytics?: () => void;
+  showAnalyticsButton?: boolean;
 }
 
-export function Header({ boardTitle, onSearch, onCreateBoard }: HeaderProps) {
+export function Header({ boardTitle, onSearch, onCreateBoard, onShowAnalytics, showAnalyticsButton = false }: HeaderProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -59,6 +61,16 @@ export function Header({ boardTitle, onSearch, onCreateBoard }: HeaderProps) {
         </div>
 
         <div className="flex items-center space-x-2 flex-shrink-0">
+          {showAnalyticsButton && (
+            <button 
+              onClick={onShowAnalytics}
+              className="bg-blue-600 hover:bg-blue-500 text-white px-3 py-2 rounded-lg font-medium transition-all duration-200 border border-blue-500 text-sm whitespace-nowrap flex items-center space-x-2"
+              title="Project Analytics"
+            >
+              <BarChart3 className="h-4 w-4" />
+              <span className="hidden sm:inline">Analytics</span>
+            </button>
+          )}
           <button 
             onClick={onCreateBoard}
             className="bg-purple-600 hover:bg-purple-500 text-white px-3 py-2 rounded-lg font-medium transition-all duration-200 border border-purple-500 text-sm whitespace-nowrap"
