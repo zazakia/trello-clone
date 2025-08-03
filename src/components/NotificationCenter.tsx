@@ -26,17 +26,17 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
   const [showSettings, setShowSettings] = useState(false);
 
   const filteredNotifications = useMemo(() => {
-    let filtered = state.notifications.filter(n => !n.dismissedAt);
+    let filtered = state.notifications.filter((n: AppNotification) => !n.dismissedAt);
 
     // Filter out snoozed notifications that aren't due yet
     const now = new Date();
-    filtered = filtered.filter(n => !n.snoozedUntil || new Date(n.snoozedUntil) <= now);
+    filtered = filtered.filter((n: AppNotification) => !n.snoozedUntil || new Date(n.snoozedUntil) <= now);
 
     switch (filter) {
       case 'unread':
-        return filtered.filter(n => !n.readAt);
+        return filtered.filter((n: AppNotification) => !n.readAt);
       case 'reminders':
-        return filtered.filter(n => n.type === 'reminder');
+        return filtered.filter((n: AppNotification) => n.type === 'reminder');
       default:
         return filtered;
     }
@@ -190,7 +190,7 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
             </div>
           ) : (
             <div className="divide-y divide-gray-100">
-              {filteredNotifications.map((notification) => (
+              {filteredNotifications.map((notification: AppNotification) => (
                 <NotificationItem
                   key={notification.id}
                   notification={notification}

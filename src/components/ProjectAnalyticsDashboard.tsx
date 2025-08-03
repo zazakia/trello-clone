@@ -38,13 +38,20 @@ export function ProjectAnalyticsDashboard({ project, onClose }: ProjectAnalytics
   }, [project]);
 
   const milestoneProgress = useMemo(() => {
-    return projectAnalyticsService.calculateMilestoneProgress(project.milestones);
+    return projectAnalyticsService.calculateMilestoneProgress(project.milestones || []);
   }, [project.milestones]);
 
-  // Update project with calculated health score
+  // Update project with calculated health score and default values
   const projectWithHealth: Project = {
     ...project,
-    healthScore
+    startDate: project.startDate || project.created_at || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+    endDate: project.endDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+    status: project.status || 'active',
+    healthScore,
+    completionPercentage: project.completionPercentage || 0,
+    milestones: project.milestones || [],
+    teamMembers: project.teamMembers || [],
+    timeEntries: project.timeEntries || []
   };
 
   const tabs = [
@@ -93,7 +100,7 @@ export function ProjectAnalyticsDashboard({ project, onClose }: ProjectAnalytics
             {/* Time Range Selector */}
             <select 
               value={timeRange}
-              onChange={(e) => setTimeRange(e.target.value as any)}
+              onChange={(e) => setTimeRange(e.target.value as 'week' | 'month' | 'quarter')}
               className="border border-gray-300 rounded-lg px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
             >
               <option value="week">Last Week</option>
@@ -133,7 +140,7 @@ export function ProjectAnalyticsDashboard({ project, onClose }: ProjectAnalytics
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => setActiveTab(tab.id as 'overview' | 'burndown' | 'timeline' | 'team')}
                 className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   activeTab === tab.id
                     ? 'bg-purple-100 text-purple-700'

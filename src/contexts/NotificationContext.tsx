@@ -1,4 +1,4 @@
-import { createContext, useContext, useReducer, useCallback, type ReactNode } from 'react';
+import { createContext, useReducer, useCallback, useMemo, useContext, type ReactNode } from 'react';
 import type { AppNotification, NotificationSettings } from '../types';
 
 interface NotificationState {
@@ -135,7 +135,7 @@ interface NotificationContextType {
   actions: NotificationActions;
 }
 
-const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
+export const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
 interface NotificationProviderProps {
   children: ReactNode;
@@ -144,42 +144,44 @@ interface NotificationProviderProps {
 export function NotificationProvider({ children }: NotificationProviderProps) {
   const [state, dispatch] = useReducer(notificationReducer, initialState);
 
-  const actions = {
-    addNotification: useCallback((notification: Omit<AppNotification, 'id' | 'createdAt'>) => {
-      const newNotification: AppNotification = {
-        ...notification,
-        id: crypto.randomUUID(),
-        createdAt: new Date().toISOString(),
-      };
-      dispatch({ type: 'ADD_NOTIFICATION', payload: newNotification });
-    }, []),
+  const addNotification = useCallback((notification: Omit<AppNotification, 'id' | 'createdAt'>) => {
+    const newNotification: AppNotification = {
+      ...notification,
+      id: crypto.randomUUID(),
+      createdAt: new Date().toISOString(),
+    };
+    dispatch({ type: 'ADD_NOTIFICATION', payload: newNotification });
+  }, []);
 
-    markAsRead: useCallback((id: string) => {
+  const actions = useMemo(() => ({
+    addNotification,
+
+    markAsRead: (id: string) => {
       dispatch({ type: 'MARK_AS_READ', payload: id });
-    }, []),
+    },
 
-    markAllAsRead: useCallback(() => {
+    markAllAsRead: () => {
       dispatch({ type: 'MARK_ALL_AS_READ' });
-    }, []),
+    },
 
-    dismissNotification: useCallback((id: string) => {
+    dismissNotification: (id: string) => {
       dispatch({ type: 'DISMISS_NOTIFICATION', payload: id });
-    }, []),
+    },
 
-    snoozeNotification: useCallback((id: string, minutes: number) => {
+    snoozeNotification: (id: string, minutes: number) => {
       const snoozedUntil = new Date(Date.now() + minutes * 60 * 1000).toISOString();
       dispatch({ type: 'SNOOZE_NOTIFICATION', payload: { id, snoozedUntil } });
-    }, []),
+    },
 
-    removeNotification: useCallback((id: string) => {
+    removeNotification: (id: string) => {
       dispatch({ type: 'REMOVE_NOTIFICATION', payload: id });
-    }, []),
+    },
 
-    updateSettings: useCallback((settings: Partial<NotificationSettings>) => {
+    updateSettings: (settings: Partial<NotificationSettings>) => {
       dispatch({ type: 'UPDATE_SETTINGS', payload: settings });
-    }, []),
+    },
 
-    createReminderNotification: useCallback((cardTitle: string, reminderDate: string, cardId: string, boardId: string) => {
+    createReminderNotification: (cardTitle: string, reminderDate: string, cardId: string, boardId: string) => {
       const notification: Omit<AppNotification, 'id' | 'createdAt'> = {
         type: 'reminder',
         title: '🔔 Reminder Due',
@@ -192,9 +194,9 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
           cardTitle,
         },
       };
-      actions.addNotification(notification);
-    }, []),
-  };
+      addNotification(notification);
+    },
+  }), [addNotification]);
 
   return (
     <NotificationContext.Provider value={{ state, actions }}>
@@ -203,6 +205,7 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
   );
 }
 
+// Export hook for component usage
 export function useNotifications() {
   const context = useContext(NotificationContext);
   if (context === undefined) {
@@ -210,3 +213,5 @@ export function useNotifications() {
   }
   return context;
 }
+
+

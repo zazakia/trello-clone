@@ -74,7 +74,7 @@ export function Card({ card, index, onUpdate, onDelete, searchQuery = '' }: Card
     
     return parts.map((part, index) => 
       regex.test(part) ? (
-        <mark key={index} className="bg-yellow-200 text-gray-900 px-1 rounded">
+        <mark key={index} className="bg-gradient-to-r from-yellow-200 to-amber-200 text-slate-900 px-1.5 py-0.5 rounded-lg font-medium">
           {part}
         </mark>
       ) : (
@@ -90,43 +90,54 @@ export function Card({ card, index, onUpdate, onDelete, searchQuery = '' }: Card
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
-          className={`bg-white rounded-lg shadow-md border border-gray-200 p-4 mb-3 group hover:shadow-lg transition-all duration-200 ${
-            snapshot.isDragging ? 'rotate-2 shadow-xl scale-105' : ''
+          className={`group relative bg-white/95 backdrop-blur-sm rounded-2xl border border-white/50 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden ${
+            snapshot.isDragging ? 'rotate-1 shadow-2xl scale-105 ring-4 ring-blue-500/20 z-50' : 'hover:scale-[1.02]'
           }`}
         >
-          {isEditing ? (
-            <div className="space-y-3">
-              <input
-                type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                onKeyDown={handleKeyDown}
-                className="w-full p-2 bg-white border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                autoFocus
-              />
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Add a description..."
-                className="w-full p-2 bg-white border border-gray-300 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-                rows={2}
-              />
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={handleSave}
-                  className="p-2 text-green-600 hover:bg-green-100 rounded transition-colors"
-                >
-                  <Check className="h-4 w-4" />
-                </button>
-                <button
-                  onClick={handleCancel}
-                  className="p-2 text-gray-500 hover:bg-gray-100 rounded transition-colors"
-                >
-                  <X className="h-4 w-4" />
-                </button>
+          {/* Card Accent Border */}
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-purple-500 opacity-60" />
+          
+          <div className="p-5">
+            {isEditing ? (
+              <div className="space-y-4">
+                <input
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  className="w-full p-4 bg-white/90 backdrop-blur-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-slate-800 placeholder-slate-400 font-semibold shadow-sm"
+                  autoFocus
+                  placeholder="Card title..."
+                />
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Add a description (optional)..."
+                  className="w-full p-4 bg-white/90 backdrop-blur-sm border border-slate-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-slate-700 placeholder-slate-400 shadow-sm"
+                  rows={3}
+                />
+                <div className="flex items-center justify-between">
+                  <div className="text-xs text-slate-500 font-medium">
+                    Press Enter to save, Esc to cancel
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={handleSave}
+                      className="flex items-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-semibold hover:from-green-600 hover:to-green-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+                    >
+                      <Check className="h-4 w-4" />
+                      <span>Save</span>
+                    </button>
+                    <button
+                      onClick={handleCancel}
+                      className="p-3 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-all duration-200"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
               </div>
-            </div>
           ) : (
             <div>
               <div className="flex items-start justify-between">
@@ -163,37 +174,56 @@ export function Card({ card, index, onUpdate, onDelete, searchQuery = '' }: Card
                   </button>
                 </div>
               </div>
-              {card.description && (
-                <p className="text-xs text-gray-600 mt-2">
-                  {highlightText(card.description, searchQuery)}
-                </p>
-              )}
-              
-              {/* Reminder indicator */}
-              {card.reminder_enabled && card.reminder_date && (
-                <div className="mt-2 flex items-center space-x-1 text-xs">
-                  <Clock className="h-3 w-3 text-purple-500" />
-                  <span className={`font-medium ${
-                    new Date(card.reminder_date) < new Date() 
-                      ? 'text-red-500' 
-                      : 'text-purple-600'
-                  }`}>
-                    {formatReminderDate(card.reminder_date)}
-                  </span>
+                {/* Card Description */}
+                {card.description && (
+                  <div className="bg-slate-50/80 rounded-xl p-3 border border-slate-100">
+                    <p className="text-sm text-slate-600 leading-relaxed">
+                      {highlightText(card.description, searchQuery)}
+                    </p>
+                  </div>
+                )}
+
+                {/* Reminder Badge */}
+                {card.reminder_enabled && card.reminder_date && (
+                  <div className="flex items-center justify-between">
+                    <div className={`inline-flex items-center space-x-2 px-3 py-2 rounded-xl text-xs font-semibold ${
+                      new Date(card.reminder_date) < new Date() 
+                        ? 'bg-red-100 text-red-700 border border-red-200' 
+                        : 'bg-purple-100 text-purple-700 border border-purple-200'
+                    }`}>
+                      <Clock className="h-3 w-3" />
+                      <span>{formatReminderDate(card.reminder_date)}</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Card Footer */}
+                <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-6 h-6 bg-gradient-to-br from-blue-400 to-blue-500 rounded-lg flex items-center justify-center">
+                      <span className="text-white text-xs font-bold">T</span>
+                    </div>
+                    <span className="text-xs text-slate-500 font-medium">Task</span>
+                  </div>
+                  <div className="text-xs text-slate-400">
+                    {new Date(card.created_at || Date.now()).toLocaleDateString()}
+                  </div>
                 </div>
-              )}
-            </div>
+              </div>
           )}
           
-          {/* Reminder Picker Modal */}
-          {showReminderPicker && (
-            <ReminderPicker
-              reminderDate={card.reminder_date}
-              reminderEnabled={card.reminder_enabled}
-              onSave={handleReminderSave}
-              onClose={() => setShowReminderPicker(false)}
-            />
-          )}
+            {/* Reminder Picker Modal */}
+            {showReminderPicker && (
+              <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+                <ReminderPicker
+                  reminderDate={card.reminder_date}
+                  reminderEnabled={card.reminder_enabled}
+                  onSave={handleReminderSave}
+                  onClose={() => setShowReminderPicker(false)}
+                />
+              </div>
+            )}
+          </div>
         </div>
       )}
     </Draggable>

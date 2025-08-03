@@ -77,112 +77,134 @@ export function List({
         <div
           ref={provided.innerRef}
           {...provided.draggableProps}
-          className={`bg-gray-100 rounded-lg p-4 w-72 flex-shrink-0 shadow-lg border border-gray-200 transition-all duration-200 ${
-            snapshot.isDragging ? 'rotate-2 scale-105 shadow-xl' : ''
+          className={`relative group w-80 flex-shrink-0 transition-all duration-300 ${
+            snapshot.isDragging ? 'rotate-1 scale-105 z-50' : ''
           }`}
         >
-          <div className="flex items-center justify-between mb-3 cursor-grab active:cursor-grabbing hover:bg-gray-200 p-2 -m-2 rounded transition-colors" {...provided.dragHandleProps}>
-            {isEditingTitle ? (
-              <div className="flex items-center space-x-2 flex-1">
-                <input
-                  type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  className="flex-1 p-2 bg-white border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 placeholder-gray-500"
-                  autoFocus
-                />
-                <button
-                  onClick={handleSaveTitle}
-                  className="p-2 text-green-600 hover:bg-green-100 rounded transition-colors"
-                >
-                  <Check className="h-4 w-4" />
-                </button>
-                <button
-                  onClick={handleCancelTitle}
-                  className="p-2 text-gray-500 hover:bg-gray-200 rounded transition-colors"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-            ) : (
-              <>
-                <div className="flex items-center space-x-2 flex-1">
-                  <GripVertical className="h-4 w-4 text-gray-500" />
-                  <h3 className="font-semibold text-gray-800 text-sm">{list.title}</h3>
+          {/* Glass Card Background */}
+          <div className={`relative bg-white/90 backdrop-blur-xl rounded-2xl border border-white/50 shadow-xl transition-all duration-300 ${
+            snapshot.isDragging ? 'shadow-2xl ring-4 ring-blue-500/20' : 'hover:shadow-2xl group-hover:border-white/60'
+          }`}>
+            
+            {/* Header with Drag Handle */}
+            <div className="flex items-center justify-between p-5 pb-3" {...provided.dragHandleProps}>
+              <div className="flex items-center space-x-3 flex-1">
+                <div className="p-1.5 bg-gradient-to-br from-slate-100 to-slate-200 rounded-lg cursor-grab active:cursor-grabbing group-hover:from-slate-200 group-hover:to-slate-300 transition-all duration-200">
+                  <GripVertical className="h-4 w-4 text-slate-500" />
                 </div>
-                <div className="relative">
-                  <button
-                    onClick={() => setShowMenu(!showMenu)}
-                    className="p-1 hover:bg-gray-200 rounded transition-colors"
-                  >
-                    <MoreHorizontal className="h-4 w-4 text-gray-600" />
-                  </button>
-                  {showMenu && (
-                    <>
-                      <div
-                        className="fixed inset-0 z-10"
-                        onClick={() => setShowMenu(false)}
-                      />
-                      <div className="absolute right-0 top-6 bg-white rounded-lg shadow-xl border border-gray-200 py-1 min-w-[120px] z-20">
-                        <button
-                          onClick={() => {
-                            setIsEditingTitle(true);
-                            setShowMenu(false);
-                          }}
-                          className="flex items-center space-x-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                        >
-                          <Edit2 className="h-3 w-3" />
-                          <span>Edit</span>
-                        </button>
-                        <button
-                          onClick={() => {
-                            onDeleteList(list.id);
-                            setShowMenu(false);
-                          }}
-                          className="flex items-center space-x-2 w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
-                        >
-                          <Trash2 className="h-3 w-3" />
-                          <span>Delete</span>
-                        </button>
+                
+                {isEditingTitle ? (
+                  <div className="flex items-center space-x-2 flex-1">
+                    <input
+                      type="text"
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      className="flex-1 p-3 bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-slate-800 placeholder-slate-400 font-semibold"
+                      autoFocus
+                    />
+                    <button
+                      onClick={handleSaveTitle}
+                      className="p-2.5 text-green-600 hover:bg-green-50 rounded-xl transition-all duration-200 border border-green-200 hover:border-green-300"
+                    >
+                      <Check className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={handleCancelTitle}
+                      className="p-2.5 text-slate-500 hover:bg-slate-50 rounded-xl transition-all duration-200 border border-slate-200 hover:border-slate-300"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between flex-1">
+                    <h3 className="font-bold text-slate-800 text-lg">{list.title}</h3>
+                    <div className="flex items-center space-x-1">
+                      <div className="px-2 py-1 bg-slate-100 rounded-lg text-xs font-medium text-slate-600">
+                        {filteredCards.length}
                       </div>
-                    </>
-                  )}
-                </div>
-              </>
-            )}
-          </div>
-
-          <Droppable droppableId={list.id} type="card">
-            {(provided, snapshot) => (
-              <div
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-                className={`min-h-[4px] transition-all duration-200 ${
-                  snapshot.isDraggingOver ? 'bg-blue-500/20 rounded-lg p-1' : ''
-                }`}
-              >
-                {(searchQuery ? filteredCards : sortedCards).map((card, cardIndex) => (
-                  <Card
-                    key={card.id}
-                    card={card}
-                    index={cardIndex}
-                    onUpdate={onUpdateCard}
-                    onDelete={onDeleteCard}
-                    searchQuery={searchQuery}
-                  />
-                ))}
-                {provided.placeholder}
+                      <div className="relative">
+                        <button
+                          onClick={() => setShowMenu(!showMenu)}
+                          className="p-2 hover:bg-slate-100 rounded-xl transition-all duration-200 text-slate-500 hover:text-slate-700"
+                        >
+                          <MoreHorizontal className="h-4 w-4" />
+                        </button>
+                        {showMenu && (
+                          <>
+                            <div
+                              className="fixed inset-0 z-10"
+                              onClick={() => setShowMenu(false)}
+                            />
+                            <div className="absolute right-0 top-12 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/50 py-2 min-w-[140px] z-20">
+                              <button
+                                onClick={() => {
+                                  setIsEditingTitle(true);
+                                  setShowMenu(false);
+                                }}
+                                className="flex items-center space-x-3 w-full px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 transition-colors font-medium"
+                              >
+                                <Edit2 className="h-4 w-4" />
+                                <span>Edit List</span>
+                              </button>
+                              <div className="h-px bg-slate-200 mx-2 my-1" />
+                              <button
+                                onClick={() => {
+                                  onDeleteList(list.id);
+                                  setShowMenu(false);
+                                }}
+                                className="flex items-center space-x-3 w-full px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors font-medium"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                                <span>Delete List</span>
+                              </button>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
-            )}
-          </Droppable>
+            </div>
 
-          <AddButton
-            onAdd={(title) => onCreateCard(title, list.id)}
-            placeholder="Enter a title for this card..."
-            buttonText="+ Add a card"
-            className="mt-2 text-gray-600 hover:text-gray-800 hover:bg-gray-200"
-          />
+            {/* Cards Container */}
+            <div className="px-5 pb-3">
+              <Droppable droppableId={list.id} type="card">
+                {(provided, snapshot) => (
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.droppableProps}
+                    className={`min-h-[8px] space-y-3 transition-all duration-300 rounded-xl ${
+                      snapshot.isDraggingOver ? 'bg-blue-50/80 ring-2 ring-blue-200/50 ring-inset p-2' : ''
+                    }`}
+                  >
+                    {(searchQuery ? filteredCards : sortedCards).map((card, cardIndex) => (
+                      <Card
+                        key={card.id}
+                        card={card}
+                        index={cardIndex}
+                        onUpdate={onUpdateCard}
+                        onDelete={onDeleteCard}
+                        searchQuery={searchQuery}
+                      />
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </div>
+
+            {/* Add Card Button */}
+            <div className="px-5 pb-5">
+              <AddButton
+                onAdd={(title) => onCreateCard(title, list.id)}
+                placeholder="Enter a title for this card..."
+                buttonText="+ Add a card"
+                className="border-2 border-dashed border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-600 hover:text-slate-800 rounded-xl transition-all duration-200"
+              />
+            </div>
+          </div>
         </div>
       )}
     </Draggable>
