@@ -1,13 +1,18 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BoardProvider } from './contexts/BoardContext';
 import { NotificationProvider } from './contexts/NotificationContext';
 import { useBoard } from './hooks/useBoard';
+import { useSidebar } from './hooks/useSidebar';
+import { useTheme } from './contexts/ThemeContext';
 import { Header } from './components/Header';
+import { Sidebar, MobileSidebarOverlay } from './components/Sidebar';
+import { MobileHeader } from './components/MobileHeader';
 import { BoardSelector } from './components/BoardSelector';
 import { Board } from './components/Board';
 import { ReminderManager } from './components/ReminderManager';
 import { ProjectAnalyticsDashboard } from './components/ProjectAnalyticsDashboard';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import ThemeSelector from './components/ThemeSelector';
 import type { Project } from './types';
 
 // Modern Action Button Component
@@ -22,17 +27,17 @@ function ActionButton({ icon, label, active = false, onClick }: ActionButtonProp
   return (
     <button
       onClick={onClick}
-      className={`group flex flex-col items-center space-y-1 px-3 py-2 rounded-xl transition-all duration-300 ${
-        active 
-          ? 'bg-gradient-to-t from-blue-500 to-blue-400 text-white shadow-md' 
-          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+      className={`flex flex-col items-center px-3 py-2 rounded-lg transition-colors ${
+        active
+          ? 'bg-blue-500 text-white'
+          : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
       }`}
       title={label}
     >
-      <span className={`text-lg transition-transform group-hover:scale-110 ${active ? 'filter drop-shadow-sm' : ''}`}>
+      <span className="text-lg">
         {icon}
       </span>
-      <span className={`text-xs font-medium ${active ? 'text-white' : 'text-slate-500'} hidden sm:block`}>
+      <span className="text-xs font-medium mt-1 hidden md:block">
         {label}
       </span>
     </button>
@@ -46,6 +51,15 @@ function AppContent() {
   const [showAnalytics, setShowAnalytics] = useState(false);
   const { state, actions } = useBoard();
   const { currentBoard } = state;
+  const sidebar = useSidebar();
+  const { theme } = useTheme();
+
+  // Close sidebar on mobile when navigating
+  useEffect(() => {
+    if (sidebar.isMobile) {
+      sidebar.close();
+    }
+  }, [selectedBoardId, sidebar.isMobile]);
 
   const handleSelectBoard = (boardId: string) => {
     setSelectedBoardId(boardId);
@@ -87,26 +101,72 @@ function AppContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,_rgba(59,130,246,0.1),_transparent),radial-gradient(circle_at_70%_70%,_rgba(147,51,234,0.1),_transparent)] pointer-events-none" />
-      
+    <div className={`min-h-screen flex ${theme === 'default' ? 'bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100' : theme === 'modern' ? 'bg-gradient-to-br from-gray-900 via-purple-900 to-violet-900' : 'bg-gray-900'}`}>
       <ReminderManager />
+
+      {/* Mobile Header */}
+      <MobileHeader 
+        onToggleSidebar={sidebar.toggle}
+        className="md:hidden"
+      />
+
+      {/* Black Sidebar */}
+      <Sidebar
+        isOpen={sidebar.isOpen}
+        onToggle={sidebar.toggle}
+        currentPath={window.location.pathname}
+        user={{
+          id: '1',
+          name: 'John Doe',
+          email: 'john@example.com',
+          avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face',
+          role: 'Project Manager',
+          workspace: 'Development Team',
+          isOnline: true,
+          permissions: ['view_analytics', 'manage_workspace', 'manage_billing'],
+          teamSize: 12
+        }}
+        boards={state.boards}
+        notifications={{
+          total: 5,
+          dashboard: 2,
+          activity: 3,
+          unreadMessages: 1
+        }}
+      />
+
+      {/* Mobile Overlay */}
+      <MobileSidebarOverlay 
+        isOpen={sidebar.isOpen && sidebar.isMobile}
+        onClose={sidebar.close}
+      />
       
-      {/* Modern Glass Header */}
-      <div className="relative z-50">
-        <Header 
-          boardTitle={selectedBoardId ? currentBoard?.title : undefined}
-          onSearch={handleSearch}
-          onCreateBoard={handleCreateBoard}
-          onShowAnalytics={handleShowAnalytics}
-          onShowReports={handleShowReports}
-          showAnalyticsButton={!!selectedBoardId}
-        />
-      </div>
-      
-      {/* Main Content Area */}
-      <main className="relative z-10 h-[calc(100vh-80px)] overflow-hidden">
+      {/* Main Content Container */}
+      <div className={`
+        flex-1 flex flex-col min-h-screen transition-all duration-300
+        ${sidebar.isMobile ? 'pt-16' : 'pt-0'}
+        ${!sidebar.isMobile && sidebar.isOpen ? 'ml-72' : 'ml-0'}
+      `}>
+        {/* Background Pattern */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,_rgba(59,130,246,0.1),_transparent),radial-gradient(circle_at_70%_70%,_rgba(147,51,234,0.1),_transparent)] pointer-events-none" />
+        
+        {/* Header */}
+        <div className="relative z-10">
+          <Header
+            boardTitle={selectedBoardId ? currentBoard?.title : undefined}
+            onSearch={handleSearch}
+            onCreateBoard={handleCreateBoard}
+            onShowAnalytics={handleShowAnalytics}
+            onShowReports={handleShowReports}
+            showAnalyticsButton={!!selectedBoardId}
+            onToggleSidebar={sidebar.toggle}
+            showSidebarToggle={!sidebar.isMobile}
+            themeSelector={<ThemeSelector />}
+          />
+        </div>
+        
+        {/* Main Content Area */}
+        <main className="flex-1 relative z-10 overflow-hidden">
         {selectedBoardId ? (
           <div className="h-full flex flex-col">
             {/* Breadcrumb Navigation */}
@@ -146,18 +206,16 @@ function AppContent() {
           </div>
         )}
         
-        {/* Floating Action Dock */}
+        {/* Floating Action Dock - Hidden on mobile */}
         {selectedBoardId && (
-          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-40">
-            <div className="flex items-center space-x-3 bg-white/90 backdrop-blur-xl rounded-2xl px-6 py-4 shadow-xl border border-white/30 hover:shadow-2xl transition-all duration-300">
-              <ActionButton icon="📥" label="Inbox" />
-              <ActionButton icon="📅" label="Calendar" />
+          <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-40 hidden md:block">
+            <div className="flex items-center space-x-2 bg-white rounded-lg px-4 py-3 shadow-lg border border-gray-200">
               <ActionButton icon="📋" label="Board" active />
               <ActionButton icon="📊" label="Analytics" onClick={handleShowAnalytics} />
-              <div className="w-px h-6 bg-slate-200 mx-2" />
-              <ActionButton 
-                icon="🏠" 
-                label="Home" 
+              <div className="w-px h-6 bg-gray-200 mx-1" />
+              <ActionButton
+                icon="🏠"
+                label="Home"
                 onClick={handleBackToBoards}
               />
             </div>
@@ -187,6 +245,7 @@ function AppContent() {
           </div>
         )}
         </main>
+      </div>
     </div>
   );
 }

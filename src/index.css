@@ -1,3 +1,11 @@
+/* Import CSS Reset */
+@import './styles/reset.css';
+
+/* Import Theme Styles */
+@import './styles/themes/default.css';
+@import './styles/themes/modern.css';
+@import './styles/themes/dark.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -67,5 +75,109 @@
       0 20px 25px -5px rgba(0, 0, 0, 0.1),
       0 10px 10px -5px rgba(0, 0, 0, 0.04),
       0 0 0 1px rgba(255, 255, 255, 0.1);
+  }
+
+  /* Dark Sidebar Styles */
+  .sidebar-scrollbar-dark {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(75 85 99) transparent;
+  }
+  
+  .sidebar-scrollbar-dark::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .sidebar-scrollbar-dark::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .sidebar-scrollbar-dark::-webkit-scrollbar-thumb {
+    background: rgb(75 85 99);
+    border-radius: 3px;
+  }
+  
+  .sidebar-scrollbar-dark::-webkit-scrollbar-thumb:hover {
+    background: rgb(107 114 128);
+  }
+
+  /* Dark theme utility classes */
+  .sidebar-dark {
+    background: rgb(17 24 39); /* gray-900 */
+    border-right: 1px solid rgb(55 65 81); /* gray-700 */
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.3);
+  }
+
+  .btn-primary-dark {
+    background: rgb(37 99 235); /* blue-600 */
+    color: white;
+    border: 1px solid rgb(37 99 235);
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .btn-primary-dark:hover {
+    background: rgb(29 78 216); /* blue-700 */
+    border-color: rgb(29 78 216);
+  }
+
+  .btn-secondary-dark {
+    background: rgb(55 65 81); /* gray-700 */
+    color: rgb(229 231 235); /* gray-200 */
+    border: 1px solid rgb(75 85 99); /* gray-600 */
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .btn-secondary-dark:hover {
+    background: rgb(75 85 99); /* gray-600 */
+    border-color: rgb(107 114 128); /* gray-500 */
+  }
+
+  /* Dark input styling */
+  .input-dark {
+    background: rgb(31 41 55); /* gray-800 */
+    color: rgb(229 231 235); /* gray-200 */
+    border: 1px solid rgb(55 65 81); /* gray-700 */
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .input-dark:focus {
+    background: rgb(17 24 39); /* gray-900 */
+    border-color: rgb(59 130 246); /* blue-500 */
+    box-shadow: 0 0 0 2px rgb(59 130 246 / 0.3);
+  }
+  
+  .input-dark::placeholder {
+    color: rgb(107 114 128); /* gray-500 */
+  }
+
+  /* Layout improvements to prevent overlapping */
+  .sidebar-open-layout {
+    margin-left: 280px;
+  }
+
+  .sidebar-closed-layout {
+    margin-left: 0;
+  }
+
+  .sidebar-mobile-layout {
+    margin-left: 0;
+    padding-top: 64px; /* Account for mobile header */
+  }
+
+  /* Ensure proper z-index stacking */
+  .sidebar-container {
+    z-index: 50;
+  }
+
+  .main-content-container {
+    z-index: 10;
+  }
+
+  .mobile-header-container {
+    z-index: 30;
+  }
+
+  /* Prevent content jumping when sidebar toggles */
+  .content-transition {
+    transition: margin-left 0.3s ease-in-out;
   }
 }

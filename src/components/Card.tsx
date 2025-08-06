@@ -74,7 +74,7 @@ export function Card({ card, index, onUpdate, onDelete, searchQuery = '' }: Card
     
     return parts.map((part, index) => 
       regex.test(part) ? (
-        <mark key={index} className="bg-gradient-to-r from-yellow-200 to-amber-200 text-slate-900 px-1.5 py-0.5 rounded-lg font-medium">
+        <mark key={index} className="bg-yellow-200 text-gray-900 px-1 py-0.5 rounded font-medium">
           {part}
         </mark>
       ) : (
@@ -90,22 +90,22 @@ export function Card({ card, index, onUpdate, onDelete, searchQuery = '' }: Card
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
-          className={`group relative bg-white/95 backdrop-blur-sm rounded-2xl border border-white/50 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden ${
-            snapshot.isDragging ? 'rotate-1 shadow-2xl scale-105 ring-4 ring-blue-500/20 z-50' : 'hover:scale-[1.02]'
+          className={`group relative card rounded border shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden ${
+            snapshot.isDragging ? 'rotate-1 shadow-lg scale-105 ring-2 ring-blue-500/30 z-50' : ''
           }`}
         >
           {/* Card Accent Border */}
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-purple-500 opacity-60" />
+          <div className="absolute top-0 left-0 right-0 h-1 bg-blue-500" />
           
-          <div className="p-5">
+          <div className="p-4">
             {isEditing ? (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <input
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  className="w-full p-4 bg-white/90 backdrop-blur-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-slate-800 placeholder-slate-400 font-semibold shadow-sm"
+                  className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-800 placeholder-gray-400 font-medium"
                   autoFocus
                   placeholder="Card title..."
                 />
@@ -114,24 +114,24 @@ export function Card({ card, index, onUpdate, onDelete, searchQuery = '' }: Card
                   onChange={(e) => setDescription(e.target.value)}
                   onKeyDown={handleKeyDown}
                   placeholder="Add a description (optional)..."
-                  className="w-full p-4 bg-white/90 backdrop-blur-sm border border-slate-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-slate-700 placeholder-slate-400 shadow-sm"
+                  className="w-full p-3 border border-gray-300 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700 placeholder-gray-400"
                   rows={3}
                 />
                 <div className="flex items-center justify-between">
-                  <div className="text-xs text-slate-500 font-medium">
+                  <div className="text-xs text-gray-500">
                     Press Enter to save, Esc to cancel
                   </div>
                   <div className="flex items-center space-x-2">
                     <button
                       onClick={handleSave}
-                      className="flex items-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-semibold hover:from-green-600 hover:to-green-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+                      className="flex items-center space-x-2 px-3 py-2 bg-green-500 text-white rounded font-medium hover:bg-green-600 transition-colors"
                     >
                       <Check className="h-4 w-4" />
                       <span>Save</span>
                     </button>
                     <button
                       onClick={handleCancel}
-                      className="p-3 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-all duration-200"
+                      className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors"
                     >
                       <X className="h-4 w-4" />
                     </button>
@@ -144,10 +144,10 @@ export function Card({ card, index, onUpdate, onDelete, searchQuery = '' }: Card
                 <h4 className="text-sm font-medium text-gray-900 flex-1">
                   {highlightText(card.title, searchQuery)}
                 </h4>
-                <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
                     onClick={() => setShowReminderPicker(true)}
-                    className={`p-1.5 hover:bg-gray-100 rounded transition-colors ${
+                    className={`p-1 hover:bg-gray-100 rounded transition-colors ${
                       card.reminder_enabled && card.reminder_date
                         ? 'text-purple-600'
                         : 'text-gray-400 hover:text-purple-600'
@@ -162,13 +162,13 @@ export function Card({ card, index, onUpdate, onDelete, searchQuery = '' }: Card
                   </button>
                   <button
                     onClick={() => setIsEditing(true)}
-                    className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
+                    className="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
                   >
                     <Edit2 className="h-3 w-3" />
                   </button>
                   <button
                     onClick={() => onDelete(card.id)}
-                    className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                    className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
                   >
                     <Trash2 className="h-3 w-3" />
                   </button>
@@ -176,8 +176,8 @@ export function Card({ card, index, onUpdate, onDelete, searchQuery = '' }: Card
               </div>
                 {/* Card Description */}
                 {card.description && (
-                  <div className="bg-slate-50/80 rounded-xl p-3 border border-slate-100">
-                    <p className="text-sm text-slate-600 leading-relaxed">
+                  <div className="bg-gray-50 rounded p-2 mt-2">
+                    <p className="text-sm text-gray-600">
                       {highlightText(card.description, searchQuery)}
                     </p>
                   </div>
@@ -185,11 +185,11 @@ export function Card({ card, index, onUpdate, onDelete, searchQuery = '' }: Card
 
                 {/* Reminder Badge */}
                 {card.reminder_enabled && card.reminder_date && (
-                  <div className="flex items-center justify-between">
-                    <div className={`inline-flex items-center space-x-2 px-3 py-2 rounded-xl text-xs font-semibold ${
-                      new Date(card.reminder_date) < new Date() 
-                        ? 'bg-red-100 text-red-700 border border-red-200' 
-                        : 'bg-purple-100 text-purple-700 border border-purple-200'
+                  <div className="flex items-center mt-2">
+                    <div className={`inline-flex items-center space-x-1 px-2 py-1 rounded text-xs font-medium ${
+                      new Date(card.reminder_date) < new Date()
+                        ? 'bg-red-100 text-red-700'
+                        : 'bg-purple-100 text-purple-700'
                     }`}>
                       <Clock className="h-3 w-3" />
                       <span>{formatReminderDate(card.reminder_date)}</span>
@@ -198,14 +198,13 @@ export function Card({ card, index, onUpdate, onDelete, searchQuery = '' }: Card
                 )}
 
                 {/* Card Footer */}
-                <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+                <div className="flex items-center justify-between pt-2 mt-2 border-t border-gray-100">
                   <div className="flex items-center space-x-2">
-                    <div className="w-6 h-6 bg-gradient-to-br from-blue-400 to-blue-500 rounded-lg flex items-center justify-center">
+                    <div className="w-5 h-5 bg-blue-500 rounded flex items-center justify-center">
                       <span className="text-white text-xs font-bold">T</span>
                     </div>
-                    <span className="text-xs text-slate-500 font-medium">Task</span>
                   </div>
-                  <div className="text-xs text-slate-400">
+                  <div className="text-xs text-gray-400">
                     {new Date(card.created_at || Date.now()).toLocaleDateString()}
                   </div>
                 </div>
