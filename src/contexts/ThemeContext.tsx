@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-type Theme = 'default' | 'modern' | 'dark';
+type Theme = 'default' | 'modern' | 'dark' | 'pastel' | 'neoglass';
 
 interface ThemeContextType {
   theme: Theme;

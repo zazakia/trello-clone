@@ -8,8 +8,10 @@ const ThemeSelector: React.FC = () => {
   const themes = [
     { id: 'default', name: 'Default' },
     { id: 'modern', name: 'Modern' },
-    { id: 'dark', name: 'Dark' }
-  ];
+    { id: 'dark', name: 'Dark' },
+    { id: 'pastel', name: 'Pastel Playful' },
+    { id: 'neoglass', name: 'NeoGlass' },
+  ] as const;
 
   return (
     <div className="relative">
@@ -18,7 +20,7 @@ const ThemeSelector: React.FC = () => {
         <select
           value={theme}
           onChange={(e) => setTheme(e.target.value as any)}
-          className="bg-white border border-gray-300 rounded-md py-1 px-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="input py-1 px-2 text-sm"
         >
           {themes.map((t) => (
             <option key={t.id} value={t.id}>

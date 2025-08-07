@@ -5,6 +5,8 @@
 @import './styles/themes/default.css';
 @import './styles/themes/modern.css';
 @import './styles/themes/dark.css';
+@import './styles/themes/pastel-playful.css';
+@import './styles/themes/neoglass.css';
 
 @tailwind base;
 @tailwind components;

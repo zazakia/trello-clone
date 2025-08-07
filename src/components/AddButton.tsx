@@ -28,27 +28,28 @@ export function AddButton({ onAdd, placeholder, buttonText, className = '' }: Ad
 
   if (isAdding) {
     return (
-      <div className={`bg-white rounded-xl p-4 shadow-lg border border-gray-200 ${className}`}>
+      <div className={`card p-4 ${className}`}>
         <form onSubmit={handleSubmit}>
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder={placeholder}
-            className="w-full p-3 bg-white border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-purple-400 placeholder-gray-500"
+            className="input w-full resize-none"
             rows={3}
             autoFocus
           />
-          <div className="flex items-center space-x-3 mt-3">
+          <div className="flex items-center gap-3 mt-3">
             <button
               type="submit"
-              className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 shadow-lg"
+              className="btn-primary px-4 py-2 font-medium"
             >
               Add
             </button>
             <button
               type="button"
               onClick={handleCancel}
-              className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all duration-200"
+              className="btn-secondary p-2"
+              aria-label="Cancel adding"
             >
               <X className="h-4 w-4" />
             </button>
@@ -61,7 +62,7 @@ export function AddButton({ onAdd, placeholder, buttonText, className = '' }: Ad
   return (
     <button
       onClick={() => setIsAdding(true)}
-      className={`group flex items-center justify-start space-x-2 text-gray-600 hover:text-gray-800 hover:bg-gray-200 p-3 rounded-xl transition-all duration-200 w-full ${className}`}
+      className={`btn-secondary w-full flex items-center justify-start gap-2 p-3 ${className}`}
     >
       <Plus className="h-4 w-4" />
       <span className="font-medium">{buttonText}</span>

@@ -3,22 +3,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard,
   Kanban,
-  Calendar,
   BarChart3,
   Hash,
   Settings,
   Users,
-  Clock,
-  FileText,
-  TrendingDown,
-  Zap,
-  Target,
-  Timer,
   Activity,
-  MessageSquare,
   Bell,
   User,
-  Shield,
   Plus,
   Search,
   HelpCircle,
@@ -28,7 +19,6 @@ import {
   PanelLeftClose,
   X,
   LogOut,
-  Moon
 } from 'lucide-react';
 // import { Link, useLocation } from 'react-router-dom'; // TODO: Add routing later
 import type { Board } from '../types';
@@ -89,7 +79,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   currentPath = '',
   user,
   boards,
-  notifications = {}
 }) => {
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
     new Set(['workspace', 'boards'])

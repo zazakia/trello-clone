@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Search, Bell, HelpCircle, Grid3X3, ChevronDown, X, BarChart3, FileText, Menu } from 'lucide-react';
+import { Search, Bell, HelpCircle, Grid3X3, X, BarChart3, FileText, Menu, Sparkles } from 'lucide-react';
 import { useNotifications } from '../contexts/NotificationContext';
 import { NotificationCenter } from './NotificationCenter';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface HeaderProps {
   boardTitle?: string;
@@ -15,6 +16,8 @@ interface HeaderProps {
   themeSelector?: React.ReactNode;
 }
 
+const themeOrder = ['default','modern','dark','pastel','neoglass'] as const;
+
 export function Header({
   boardTitle,
   onSearch,
@@ -27,9 +30,9 @@ export function Header({
   themeSelector
 }: HeaderProps) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const { state: notificationState } = useNotifications();
+  const { theme, setTheme } = useTheme();
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
@@ -118,8 +121,20 @@ export function Header({
             </button>
             
             {themeSelector && (
-              <div className="hidden md:block">
+              <div className="hidden md:flex items-center gap-2">
                 {themeSelector}
+                {/* Compact Theme Switch - cycles themes */}
+                <button
+                  onClick={() => {
+                    const idx = themeOrder.findIndex(t => t === theme);
+                    const next = themeOrder[(idx + 1) % themeOrder.length];
+                    setTheme(next as any);
+                  }}
+                  className="btn-secondary p-2 rounded-lg"
+                  title={`Switch theme (current: ${theme})`}
+                >
+                  <Sparkles className="h-4 w-4" />
+                </button>
               </div>
             )}
             
