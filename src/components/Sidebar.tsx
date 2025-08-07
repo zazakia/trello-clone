@@ -19,6 +19,7 @@ import {
   PanelLeftClose,
   X,
   LogOut,
+  FileText,
 } from 'lucide-react';
 // import { Link, useLocation } from 'react-router-dom'; // TODO: Add routing later
 import type { Board } from '../types';
@@ -70,6 +71,7 @@ interface SidebarProps {
   user: User;
   boards: Board[];
   notifications?: Notifications;
+  onNavigate?: (view: 'boards' | 'notes') => void;
 }
 
 // Main Sidebar Component
@@ -79,6 +81,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   currentPath = '',
   user,
   boards,
+  onNavigate,
 }) => {
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
     new Set(['workspace', 'boards'])
@@ -119,6 +122,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
           icon: BarChart3,
           href: '/analytics',
           permission: 'view_analytics'
+        },
+        {
+          id: 'notes',
+          label: 'Notes',
+          icon: FileText,
+          href: '/notes'
         }
       ]
     },
@@ -207,6 +216,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             onToggleExpand={() => toggleSection(section.id)}
             currentPath={currentPath}
             user={user}
+            onNavigate={onNavigate}
           />
         ))}
       </div>
@@ -269,7 +279,8 @@ const SidebarSection: React.FC<{
   onToggleExpand: () => void;
   currentPath: string;
   user: User;
-}> = ({ section, isCollapsed, isExpanded, onToggleExpand, currentPath, user }) => {
+  onNavigate?: (view: 'boards' | 'notes') => void;
+}> = ({ section, isCollapsed, isExpanded, onToggleExpand, currentPath, user, onNavigate }) => {
   // Filter items based on user permissions
   const visibleItems = section.items.filter(item => 
     !item.permission || user.permissions.includes(item.permission)
@@ -317,6 +328,7 @@ const SidebarSection: React.FC<{
                 isCollapsed={isCollapsed}
                 isActive={currentPath === item.href}
                 level={0}
+                onNavigate={onNavigate}
               />
             ))}
           </motion.div>
@@ -332,7 +344,8 @@ const SidebarMenuItem: React.FC<{
   isCollapsed: boolean;
   isActive: boolean;
   level: number;
-}> = ({ item, isCollapsed, isActive, level = 0 }) => {
+  onNavigate?: (view: 'boards' | 'notes') => void;
+}> = ({ item, isCollapsed, isActive, level = 0, onNavigate }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const hasChildren = item.children && item.children.length > 0;
   const Icon = item.icon;
@@ -342,6 +355,10 @@ const SidebarMenuItem: React.FC<{
       setIsExpanded(!isExpanded);
     } else if (item.onClick) {
       item.onClick();
+    } else if (item.id === 'notes' && onNavigate) {
+      onNavigate('notes');
+    } else if (item.id === 'boards' && onNavigate) {
+      onNavigate('boards');
     }
   };
 
@@ -420,6 +437,7 @@ const SidebarMenuItem: React.FC<{
                   isCollapsed={false}
                   isActive={false}
                   level={level + 1}
+                  onNavigate={onNavigate}
                 />
               ))}
             </motion.div>

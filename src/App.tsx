@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { BoardProvider } from './contexts/BoardContext';
 import { NotificationProvider } from './contexts/NotificationContext';
+import { NotesProvider } from './contexts/NotesContext';
 import { useBoard } from './hooks/useBoard';
 import { useSidebar } from './hooks/useSidebar';
 import { useTheme } from './contexts/ThemeContext';
@@ -12,6 +13,7 @@ import { Board } from './components/Board';
 import { ReminderManager } from './components/ReminderManager';
 import { ProjectAnalyticsDashboard } from './components/ProjectAnalyticsDashboard';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { NotesLayout } from './components/NotesLayout';
 import ThemeSelector from './components/ThemeSelector';
 import type { Project } from './types';
 
@@ -46,6 +48,7 @@ function ActionButton({ icon, label, active = false, onClick }: ActionButtonProp
 
 function AppContent() {
   const [selectedBoardId, setSelectedBoardId] = useState<string | null>(null);
+  const [currentView, setCurrentView] = useState<'boards' | 'notes'>('boards');
   const [searchQuery, setSearchQuery] = useState('');
   const [showCreateBoard, setShowCreateBoard] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
@@ -133,6 +136,10 @@ function AppContent() {
           activity: 3,
           unreadMessages: 1
         }}
+        onNavigate={(view) => {
+          setCurrentView(view);
+          setSelectedBoardId(null);
+        }}
       />
 
       {/* Mobile Overlay */}
@@ -167,7 +174,11 @@ function AppContent() {
         
         {/* Main Content Area */}
         <main className="flex-1 relative z-10 overflow-hidden">
-        {selectedBoardId ? (
+        {currentView === 'notes' ? (
+          <div className="h-full">
+            <NotesLayout className="h-full" />
+          </div>
+        ) : selectedBoardId ? (
           <div className="h-full flex flex-col">
             {/* Breadcrumb Navigation */}
             <div className="px-6 py-4 bg-white/50 backdrop-blur-sm border-b border-white/20">
@@ -254,7 +265,24 @@ function App() {
   return (
     <NotificationProvider>
       <BoardProvider>
-        <AppContent />
+        <ErrorBoundary fallback={
+          <div className="min-h-screen flex items-center justify-center bg-gray-50">
+            <div className="text-center">
+              <h2 className="text-xl font-semibold text-gray-900 mb-2">Something went wrong</h2>
+              <p className="text-gray-600 mb-4">Please refresh the page to try again.</p>
+              <button 
+                onClick={() => window.location.reload()}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+                Refresh Page
+              </button>
+            </div>
+          </div>
+        }>
+          <NotesProvider>
+            <AppContent />
+          </NotesProvider>
+        </ErrorBoundary>
       </BoardProvider>
     </NotificationProvider>
   );

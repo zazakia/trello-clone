@@ -238,3 +238,148 @@ export interface Sprint {
   velocity: number;
   burndownData: BurndownPoint[];
 }
+
+// Notes and Knowledge Management Types
+export interface Note {
+  id: string;
+  title?: string;
+  content: any; // Rich text JSON structure
+  plainText: string; // For search indexing
+  notebookId?: string;
+  createdAt: string;
+  updatedAt: string;
+  createdBy?: string;
+  isShared: boolean;
+  viewCount: number;
+  tags?: Tag[];
+  attachments?: NoteAttachment[];
+  linkedCards?: Card[];
+}
+
+export interface Notebook {
+  id: string;
+  name: string;
+  description?: string;
+  color: string;
+  createdAt: string;
+  updatedAt: string;
+  noteCount: number;
+  notes?: Note[];
+}
+
+export interface Tag {
+  id: string;
+  name: string;
+  color: string;
+  usageCount: number;
+  createdAt: string;
+}
+
+export interface NoteAttachment {
+  id: string;
+  noteId: string;
+  filename: string;
+  filePath: string;
+  fileSize: number;
+  mimeType: string;
+  uploadedAt: string;
+}
+
+export interface NoteCardLink {
+  id: string;
+  noteId: string;
+  cardId: string;
+  createdAt: string;
+}
+
+export interface NoteShare {
+  id: string;
+  noteId: string;
+  sharedWithEmail: string;
+  permission: 'view' | 'edit';
+  createdAt: string;
+}
+
+export interface SearchFilters {
+  notebook?: string;
+  tags?: string[];
+  dateRange?: [Date, Date];
+  hasAttachments?: boolean;
+  isShared?: boolean;
+  linkedToCard?: boolean;
+}
+
+export interface SearchResult {
+  note: Note;
+  highlights: string[];
+  relevanceScore: number;
+}
+
+export interface CreateNoteData {
+  title?: string;
+  content: any;
+  notebookId?: string;
+  tags?: string[];
+  linkedCardId?: string;
+}
+
+export interface UpdateNoteData {
+  title?: string;
+  content?: any;
+  notebookId?: string;
+  tags?: string[];
+}
+
+export interface CreateNotebookData {
+  name: string;
+  description?: string;
+  color?: string;
+}
+
+export interface UpdateNotebookData {
+  name?: string;
+  description?: string;
+  color?: string;
+}
+
+export interface CreateTagData {
+  name: string;
+  color?: string;
+}
+
+// Notes Error Types
+export enum NotesErrorType {
+  NOTE_NOT_FOUND = 'NOTE_NOT_FOUND',
+  NOTEBOOK_NOT_FOUND = 'NOTEBOOK_NOT_FOUND',
+  TAG_NOT_FOUND = 'TAG_NOT_FOUND',
+  SAVE_FAILED = 'SAVE_FAILED',
+  UPLOAD_FAILED = 'UPLOAD_FAILED',
+  SEARCH_FAILED = 'SEARCH_FAILED',
+  PERMISSION_DENIED = 'PERMISSION_DENIED',
+  INVALID_CONTENT = 'INVALID_CONTENT'
+}
+
+export interface NotesError {
+  type: NotesErrorType;
+  message: string;
+  details?: any;
+}
+
+// Rich Text Editor Types
+export interface EditorContent {
+  type: 'doc';
+  content: EditorNode[];
+}
+
+export interface EditorNode {
+  type: string;
+  attrs?: Record<string, any>;
+  content?: EditorNode[];
+  text?: string;
+  marks?: EditorMark[];
+}
+
+export interface EditorMark {
+  type: string;
+  attrs?: Record<string, any>;
+}
